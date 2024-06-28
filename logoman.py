@@ -4,20 +4,16 @@ import random
 import time
 
 
-# Inicialización de Pygame
 pygame.init()
 
-# Tamaño de la pantalla
 TAMAÑO_PANTALLA = (1200, 700)
 pantalla = pygame.display.set_mode(TAMAÑO_PANTALLA)
 pygame.display.set_caption("Logoman")
 
-# Colores
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
 
-# Fuente
 fuente = pygame.font.Font(None, 36)
 
 logos_correctos = [
@@ -96,7 +92,6 @@ logos_correctos = [
         pygame.image.load("logos_incorrectos\logo_incorrecto_nokia_2.png"),
         pygame.image.load("logos_incorrectos\logo_incorrecto_nokia_3.png")
     ]}
-    # Añade más logos correctos con sus incorrectos según sea necesario
 ]
 
 
@@ -110,7 +105,7 @@ def mostrar_mensaje(texto, posicion):
 def seleccionar_logo_y_opciones(ya_usados):
     disponibles = [logo for logo in logos_correctos if logo["nombre"] not in ya_usados]
     if not disponibles:
-        return None, None  # No hay más logos disponibles
+        return None, None  # No hay más logos
     logo_correcto = random.choice(disponibles)
     opciones = random.sample(logo_correcto["incorrectas"], 3)
     opciones.append(logo_correcto["imagen"])
@@ -124,11 +119,11 @@ monedas = 0
 rounds = 0
 tiempos_respuestas = []
 comodines = {"Next": 1, "Half": 1, "Reload": 1}
-ya_usados = []  # Lista para llevar el seguimiento de los logos ya usados
+ya_usados = []  # Lista para llevar el seguimiento de los logos
 mostrar_alerta = False
 tiempo_alerta = 0
 
-# Función para mostrar las vidas restantes
+# Función para mostrar las vidas
 def mostrar_vidas(vidas):
     for i in range(vidas):
         pygame.draw.circle(pantalla, ROJO, (30 + i * 30, 30), 10)
@@ -140,16 +135,16 @@ def usar_half(opciones, logo_correcto):
     random.shuffle(opciones_mostradas)
     return opciones_mostradas
 
-# Bucle principal del juego
+
 ejecutando = True
 while ejecutando and rounds < 15:
     logo_correcto, opciones = seleccionar_logo_y_opciones(ya_usados)
-    if logo_correcto is None:  # No hay más logos disponibles
+    if logo_correcto is None:  # No hay más logos
         break
     nombre_empresa = logo_correcto["nombre"]
     tiempo_inicio = time.time()
     usar_comodin_half = False
-    opciones_mostradas = opciones  # Mantener una copia de las opciones originales
+    opciones_mostradas = opciones 
     siguiente_ronda = False
     
     while not siguiente_ronda and ejecutando:
@@ -184,7 +179,7 @@ while ejecutando and rounds < 15:
                 elif evento.key == pygame.K_r and comodines["Reload"] > 0:
                     comodines["Reload"] -= 1
                     logo_correcto, opciones = seleccionar_logo_y_opciones(ya_usados)
-                    if logo_correcto is None:  # No hay más logos disponibles
+                    if logo_correcto is None:  # No hay más logos
                         break
                     nombre_empresa = logo_correcto["nombre"]
                     opciones_mostradas = opciones
@@ -193,51 +188,40 @@ while ejecutando and rounds < 15:
         if not ejecutando or rounds >= 15 or vidas <= 0:
             break
 
-        # Llenar la pantalla de blanco
+        # Llenar la pantalla 
         pantalla.fill(BLANCO)
 
-        # Mostrar el nombre de la empresa
+        # Mostrar la empresa
         mostrar_mensaje(f"¿Cuál es el logo de {nombre_empresa}?", (400, 100))
 
-        # Mostrar las opciones de logos
+        # Mostrar las opciones
         for i, opcion in enumerate(opciones_mostradas):
             separacion = 250
             pantalla.blit(opcion, (i * separacion + 100, 200))
 
-        # Mostrar las opciones numeradas
         mostrar_mensaje("1                                 2                                  3                                   4", (200, 400))
-
-        # Mostrar las vidas restantes
         mostrar_vidas(vidas)
 
-        # Mostrar los comodines restantes
+        # Mostrar los comodines
         mostrar_mensaje(f"Next (N para ejecutar): {comodines['Next']}", (50, 550))
         mostrar_mensaje(f"Half (H para ejecutar): {comodines['Half']}", (50, 610))
         mostrar_mensaje(f"Reload (R para ejecutar): {comodines['Reload']}", (50, 660))
-
-        # Mostrar alerta si hay error
-        if mostrar_alerta and time.time() - tiempo_alerta < 2:
-            mostrar_mensaje("¡Incorrecto!", (350, 50), color=ROJO)
-        else:
-            mostrar_alerta = False
-
-        # Actualizar la pantalla
+        
         pygame.display.update()
 
-    # Incrementar el número de rondas y registrar el tiempo de respuesta
+    # pASA A LA SIGUIENTE RONDA Y MODIFICA TIMEPO
     if siguiente_ronda:
         rounds += 1
         tiempo_respuesta = time.time() - tiempo_inicio
         tiempos_respuestas.append(tiempo_respuesta)
 
-    # Verificar si el juego debe terminar
     if vidas <= 0:
         ejecutando = False
 
-# Calcular promedio de tiempo de respuesta
-promedio_tiempo = sum(tiempos_respuestas) / len(tiempos_respuestas) if tiempos_respuestas else 0
+# Calcular promedio
+promedio_tiempo = sum(tiempos_respuestas) / len(tiempos_respuestas)
 
-# Mostrar resultados finales
+# Mostrar resultados
 pantalla.fill(BLANCO)
 mostrar_mensaje("Juego terminado", (300, 250))
 mostrar_mensaje(f"Promedio de tiempo de respuesta: {promedio_tiempo:.2f} segundos", (200, 300))
@@ -245,6 +229,5 @@ mostrar_mensaje(f"Total de monedas obtenidas: {monedas}", (200, 350))
 pygame.display.update()
 time.sleep(5)
 
-# Salir de Pygame
 pygame.quit()
 sys.exit()
