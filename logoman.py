@@ -76,15 +76,25 @@ logos_correctos = [
         pygame.image.load("logos_incorrectos\logo_incorrecto_snickers_2.png"),
         pygame.image.load("logos_incorrectos\logo_incorrecto_snickers_3.png")
     ]},
-    {"nombre": "LG", "imagen": pygame.image.load("logos_correctos\logo_correcto_lg.png"), "incorrectas": [
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_1.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_2.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_3.png")
+    {"nombre": "Adidas", "imagen": pygame.image.load("logos_correctos\logo_correcto_adidas.png"), "incorrectas": [
+        pygame.image.load("logos_incorrectos\logo_incorrecto_adidas_1.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_adidas_2.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_adidas_3.png")
     ]},
-    {"nombre": "LG", "imagen": pygame.image.load("logos_correctos\logo_correcto_lg.png"), "incorrectas": [
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_1.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_2.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lg_3.png")
+    {"nombre": "Microsoft", "imagen": pygame.image.load("logos_correctos\logo_correcto_microsoft.png"), "incorrectas": [
+        pygame.image.load("logos_incorrectos\logo_incorrecto_microsoft_1.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_microsoft_2.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_microsoft_3.png")
+    ]},
+    {"nombre": "Kinder", "imagen": pygame.image.load("logos_correctos\logo_correcto_kinder.png"), "incorrectas": [
+        pygame.image.load("logos_incorrectos\logo_incorrecto_kinder_1.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_kinder_2.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_kinder_3.png")
+    ]},
+    {"nombre": "Nokia", "imagen": pygame.image.load("logos_correctos\logo_correcto_nokia.png"), "incorrectas": [
+        pygame.image.load("logos_incorrectos\logo_incorrecto_nokia_1.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_nokia_2.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_nokia_3.png")
     ]}
     # Añade más logos correctos con sus incorrectos según sea necesario
 ]
@@ -95,11 +105,15 @@ def mostrar_mensaje(texto, posicion):
     pantalla.blit(texto_superficie, posicion)
 
 # Función para seleccionar un logo correcto y opciones incorrectas
-def seleccionar_logo_y_opciones():
-    logo_correcto = random.choice(logos_correctos)
+def seleccionar_logo_y_opciones(ya_usados):
+    disponibles = [logo for logo in logos_correctos if logo["nombre"] not in ya_usados]
+    if not disponibles:
+        return None, None  # No hay más logos disponibles
+    logo_correcto = random.choice(disponibles)
     opciones = random.sample(logo_correcto["incorrectas"], 3)
     opciones.append(logo_correcto["imagen"])
     random.shuffle(opciones)
+    ya_usados.append(logo_correcto["nombre"])
     return logo_correcto, opciones
 
 # Variables del juego
@@ -108,6 +122,7 @@ monedas = 0
 rounds = 0
 tiempos_respuestas = []
 comodines = {"Next": 1, "Half": 1, "Reload": 1}
+ya_usados = []  # Lista para llevar el seguimiento de los logos ya usados
 
 # Función para mostrar las vidas restantes
 def mostrar_vidas(vidas):
@@ -124,7 +139,9 @@ def usar_half(opciones, logo_correcto):
 # Bucle principal del juego
 ejecutando = True
 while ejecutando and rounds < 15:
-    logo_correcto, opciones = seleccionar_logo_y_opciones()
+    logo_correcto, opciones = seleccionar_logo_y_opciones(ya_usados)
+    if logo_correcto is None:  # No hay más logos disponibles
+        break
     nombre_empresa = logo_correcto["nombre"]
     tiempo_inicio = time.time()
     usar_comodin_half = False
@@ -162,7 +179,9 @@ while ejecutando and rounds < 15:
                     opciones_mostradas = usar_half(opciones, logo_correcto)
                 elif evento.key == pygame.K_r and comodines["Reload"] > 0:
                     comodines["Reload"] -= 1
-                    logo_correcto, opciones = seleccionar_logo_y_opciones()
+                    logo_correcto, opciones = seleccionar_logo_y_opciones(ya_usados)
+                    if logo_correcto is None:  # No hay más logos disponibles
+                        break
                     nombre_empresa = logo_correcto["nombre"]
                     opciones_mostradas = opciones
                     tiempo_inicio = time.time()
@@ -178,7 +197,8 @@ while ejecutando and rounds < 15:
 
         # Mostrar las opciones de logos
         for i, opcion in enumerate(opciones_mostradas):
-            pantalla.blit(opcion, (150 * i + 100, 300))
+            separacion = 200
+            pantalla.blit(opcion, (i * separacion + 100, 300))
 
         # Mostrar las opciones numeradas
         mostrar_mensaje("1     2     3     4", (200, 500))
@@ -187,9 +207,9 @@ while ejecutando and rounds < 15:
         mostrar_vidas(vidas)
 
         # Mostrar los comodines restantes
-        mostrar_mensaje(f"Next (N para ejecutar): {comodines['Next']}", (50, 525))
+        mostrar_mensaje(f"Next (N para ejecutar): {comodines['Next']}", (50, 530))
         mostrar_mensaje(f"Half (H para ejecutar): {comodines['Half']}", (50, 550))
-        mostrar_mensaje(f"Reload (R para ejecutar): {comodines['Reload']}", (50, 575))
+        mostrar_mensaje(f"Reload (R para ejecutar): {comodines['Reload']}", (50, 570))
 
         # Actualizar la pantalla
         pygame.display.flip()
@@ -218,4 +238,3 @@ time.sleep(5)
 # Salir de Pygame
 pygame.quit()
 sys.exit()
-
