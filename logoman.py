@@ -3,6 +3,7 @@ import sys
 import random
 import time
 
+
 # Inicialización de Pygame
 pygame.init()
 
@@ -19,7 +20,6 @@ ROJO = (255, 0, 0)
 # Fuente
 fuente = pygame.font.Font(None, 36)
 
-# Cargar imágenes correctas e incorrectas
 logos_correctos = [
     {"nombre": "Apple", "imagen": pygame.image.load("logos_correctos\logo_correcto_apple.png"), "incorrectas": [
         pygame.image.load("logos_incorrectos\logo_incorrecto_apple_1.png"),
@@ -68,8 +68,8 @@ logos_correctos = [
     ]},
     {"nombre": "Lego", "imagen": pygame.image.load("logos_correctos\logo_correcto_lego.png"), "incorrectas": [
         pygame.image.load("logos_incorrectos\logo_incorrecto_lego_1.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lego_1.png"),
-        pygame.image.load("logos_incorrectos\logo_incorrecto_lego_1.png")
+        pygame.image.load("logos_incorrectos\logo_incorrecto_lego_2.png"),
+        pygame.image.load("logos_incorrectos\logo_incorrecto_lego_3.png")
     ]},
     {"nombre": "Snickers", "imagen": pygame.image.load("logos_correctos\logo_correcto_snickers.png"), "incorrectas": [
         pygame.image.load("logos_incorrectos\logo_incorrecto_snickers_1.png"),
@@ -99,6 +99,8 @@ logos_correctos = [
     # Añade más logos correctos con sus incorrectos según sea necesario
 ]
 
+
+
 # Función para mostrar un mensaje en la pantalla
 def mostrar_mensaje(texto, posicion):
     texto_superficie = fuente.render(texto, True, NEGRO)
@@ -123,6 +125,8 @@ rounds = 0
 tiempos_respuestas = []
 comodines = {"Next": 1, "Half": 1, "Reload": 1}
 ya_usados = []  # Lista para llevar el seguimiento de los logos ya usados
+mostrar_alerta = False
+tiempo_alerta = 0
 
 # Función para mostrar las vidas restantes
 def mostrar_vidas(vidas):
@@ -193,26 +197,32 @@ while ejecutando and rounds < 15:
         pantalla.fill(BLANCO)
 
         # Mostrar el nombre de la empresa
-        mostrar_mensaje(f"¿Cuál es el logo de {nombre_empresa}?", (200, 100))
+        mostrar_mensaje(f"¿Cuál es el logo de {nombre_empresa}?", (400, 100))
 
         # Mostrar las opciones de logos
         for i, opcion in enumerate(opciones_mostradas):
-            separacion = 200
-            pantalla.blit(opcion, (i * separacion + 100, 300))
+            separacion = 250
+            pantalla.blit(opcion, (i * separacion + 100, 200))
 
         # Mostrar las opciones numeradas
-        mostrar_mensaje("1     2     3     4", (200, 500))
+        mostrar_mensaje("1                                 2                                  3                                   4", (200, 400))
 
         # Mostrar las vidas restantes
         mostrar_vidas(vidas)
 
         # Mostrar los comodines restantes
-        mostrar_mensaje(f"Next (N para ejecutar): {comodines['Next']}", (50, 530))
-        mostrar_mensaje(f"Half (H para ejecutar): {comodines['Half']}", (50, 550))
-        mostrar_mensaje(f"Reload (R para ejecutar): {comodines['Reload']}", (50, 570))
+        mostrar_mensaje(f"Next (N para ejecutar): {comodines['Next']}", (50, 550))
+        mostrar_mensaje(f"Half (H para ejecutar): {comodines['Half']}", (50, 610))
+        mostrar_mensaje(f"Reload (R para ejecutar): {comodines['Reload']}", (50, 660))
+
+        # Mostrar alerta si hay error
+        if mostrar_alerta and time.time() - tiempo_alerta < 2:
+            mostrar_mensaje("¡Incorrecto!", (350, 50), color=ROJO)
+        else:
+            mostrar_alerta = False
 
         # Actualizar la pantalla
-        pygame.display.flip()
+        pygame.display.update()
 
     # Incrementar el número de rondas y registrar el tiempo de respuesta
     if siguiente_ronda:
@@ -232,7 +242,7 @@ pantalla.fill(BLANCO)
 mostrar_mensaje("Juego terminado", (300, 250))
 mostrar_mensaje(f"Promedio de tiempo de respuesta: {promedio_tiempo:.2f} segundos", (200, 300))
 mostrar_mensaje(f"Total de monedas obtenidas: {monedas}", (200, 350))
-pygame.display.flip()
+pygame.display.update()
 time.sleep(5)
 
 # Salir de Pygame
