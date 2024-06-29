@@ -27,14 +27,11 @@ pygame.mixer.music.load("fondoymusica/Y2meta.app - Martin Garrix - Animals (Offi
 pygame.mixer.music.set_volume(0.1)  # Ajustar volumen si es necesario
 pygame.mixer.music.play(-1)  # Reproducir en bucle
 
-# Cargar icono del juego
 icono = pygame.image.load("logos_correctos/icono_izquierda.png")
 pygame.display.set_icon(icono)
 
-# Fuente para el texto
 fuente = pygame.font.Font(None, 36)
 
-# Variables del juego
 vidas = 5
 monedas = 0
 rounds = 0
@@ -43,7 +40,6 @@ comodines = {"Next": 1, "Half": 1, "Reload": 1}
 ya_usados = []  # Lista para llevar el seguimiento de los logos
 promedio_tiempo = 0
 
-# Funciones de utilidad
 def mostrar_mensaje(texto, posicion):
     texto_superficie = fuente.render(texto, True, NEGRO)
     pantalla.blit(texto_superficie, posicion)
@@ -69,7 +65,6 @@ def usar_half(opciones, logo_correcto):
     random.shuffle(opciones_mostradas)
     return opciones_mostradas
 
-# Pantalla inicial
 def pantalla_inicial():
     pantalla.blit(fondo, (0, 0))  # Dibujar fondo de pantalla
 
