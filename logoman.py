@@ -165,7 +165,7 @@ def jugar():
                     elif botones_opciones[0].collidepoint(x, y) or botones_opciones[1].collidepoint(x, y) or botones_opciones[2].collidepoint(x, y) or botones_opciones[3].collidepoint(x, y):
                         monedas -= 10
                         vidas -= 1
-                        siguiente_ronda = True
+                        # No cambiar de ronda ni actualizar opciones, solo continuar en la misma
                     elif boton_next.collidepoint(x, y) and comodines["Next"] > 0:
                         comodines["Next"] -= 1
                         monedas += 20
@@ -185,7 +185,10 @@ def jugar():
             tiempo_transcurrido_ronda = time.time() - tiempo_inicio_ronda
             if tiempo_transcurrido_ronda > 15:  
                 vidas -= 1
-                siguiente_ronda = True
+                # No cambiar de ronda ni actualizar opciones, solo continuar en la misma
+
+            if vidas <= 0:
+                siguiente_ronda = True  # Forzar salida de la ronda si se quedan sin vidas
 
             if not ejecutando or rounds >= 15 or vidas <= 0:
                 break
@@ -221,9 +224,6 @@ def jugar():
             tiempo_respuesta = time.time() - tiempo_inicio_ronda
             tiempos_respuestas.append(tiempo_respuesta)
 
-        if vidas <= 0:
-            ejecutando = False
-
     if tiempos_respuestas:
         promedio_tiempo = sum(tiempos_respuestas) / len(tiempos_respuestas)
     else:
@@ -239,6 +239,7 @@ def jugar():
     mostrar_mensaje(f"Total de monedas obtenidas: {monedas}", (200, 350))
     pygame.display.update()
     time.sleep(5)
+
 
 def mostrar_promedio():
     pantalla.blit(fondo, (0, 0))  # Dibujar fondo de pantalla
