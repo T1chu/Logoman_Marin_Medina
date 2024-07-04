@@ -15,14 +15,21 @@ NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
 GRIS = (128, 136, 142)
 
-fondo = pygame.image.load("fondoymusica\images.jpg").convert()
+fondo = pygame.image.load("fondoymusica\descarga.gif").convert()
 fondo = pygame.transform.scale(fondo, TAMAÑO_PANTALLA)
+
+fondo_explicacion = pygame.image.load("fondoymusica\images (3).jpg")
+fondo_explicacion = pygame.transform.scale(fondo_explicacion, TAMAÑO_PANTALLA)
 
 icono = pygame.image.load("logos_correctos/icono_izquierda.png")
 pygame.display.set_icon(icono)
 
-logo = pygame.image.load("logos_correctos\logo.png")
-logo = pygame.transform.scale(logo, (320,170))
+logo = pygame.image.load("logos_correctos/logo.png")
+logo = pygame.transform.scale(logo, (320, 170))
+
+audio_perder = pygame.mixer.music.load("fondoymusica\Y2meta.app - Ponele voluntad (128 kbps).mp3")
+audio_perder = pygame.mixer.music.set_volume(0.1)
+
 
 fuente = pygame.font.Font(None, 36)
 
@@ -43,11 +50,15 @@ record_monedas = 0
 volumen_encendido = True
 icono_volumen_on = pygame.image.load("fondoymusica/volumenon.png")
 icono_volumen_on = pygame.transform.scale(icono_volumen_on, (50, 50))
-icono_volumen_off = pygame.image.load("fondoymusica/images.png")
-icono_volumen_off = pygame.transform.scale(icono_volumen_off, (50, 50))
+icono_volumen_off = pygame.image.load("fondoymusica/volumenoff.png")
+icono_volumen_off = pygame.transform.scale(icono_volumen_off, (50,50))
 icono_volumen_actual = icono_volumen_on
 
 def mostrar_mensaje(texto, posicion):
+    texto_superficie = fuente.render(texto, True, NEGRO)
+    pantalla.blit(texto_superficie, posicion)
+
+def mostrar_mensaje_volumen(texto, posicion):
     texto_superficie = fuente.render(texto, True, NEGRO)
     pantalla.blit(texto_superficie, posicion)
 
@@ -60,7 +71,8 @@ def seleccionar_logo_y_opciones(ya_usados):
     opciones.append(logo_correcto["imagen"])
     random.shuffle(opciones)
     ya_usados.append(logo_correcto["nombre"])
-    return logo_correcto, opciones
+    diccionario_seleccionar_logo_y_opciones = [logo_correcto, opciones]
+    return diccionario_seleccionar_logo_y_opciones
 
 def mostrar_vidas(vidas):
     for i in range(vidas):
@@ -71,36 +83,62 @@ def usar_half(opciones, logo_correcto):
     opciones_mostradas = [logo_correcto["imagen"], random.choice(incorrectas)]
     random.shuffle(opciones_mostradas)
     return opciones_mostradas
+    
+def determinar_nivel(record_monedas):
+    if record_monedas >= 0 and record_monedas <= 50:
+        apodo = "Novato"
+    elif record_monedas > 50 and record_monedas <= 100:
+        apodo ="Crack"
+    elif record_monedas > 100 and record_monedas <= 150:
+        apodo ="Experto"
+    elif record_monedas > 150 and record_monedas <= 200:
+        apodo ="Maestro"
+    elif record_monedas > 200 and record_monedas <= 250:
+        apodo ="Genio"
+    elif record_monedas > 250 and record_monedas <= 299:
+        apodo ="LA MAQUINA"
+    elif record_monedas == 300:
+        apodo = "DIOS"
+    return apodo
+
 
 def pantalla_inicial():
     pantalla.blit(fondo, (0, 0))
 
-    pantalla.blit(logo, (470, 30))
+    pantalla.blit(logo, (470, 10))
 
-    boton_jugar = pygame.Rect(500, 200, 250, 50)
-    boton_promedio = pygame.Rect(500, 300, 250, 50)
-    boton_coins = pygame.Rect(500, 400, 250, 50)
-    boton_record = pygame.Rect(500, 500, 250, 50)
+    boton_jugar = pygame.Rect(500, 120, 250, 50)
+    boton_promedio = pygame.Rect(500, 220, 250, 50)
+    boton_coins = pygame.Rect(500, 320, 250, 50)
+    boton_record = pygame.Rect(500, 420, 250, 50)
     boton_volumen = pygame.Rect(30, 50, 200, 60)
+    boton_nivel = pygame.Rect(500, 520, 250, 50)
+    boton_salir = pygame.Rect(500,620,250,50)
 
     pygame.draw.rect(pantalla, ROJO, boton_jugar, border_radius=10)
     pygame.draw.rect(pantalla, ROJO, boton_promedio, border_radius=10)
     pygame.draw.rect(pantalla, ROJO, boton_coins, border_radius=10)
     pygame.draw.rect(pantalla, ROJO, boton_record, border_radius=10)
     pygame.draw.rect(pantalla, BLANCO, boton_volumen, border_radius=10)
+    pygame.draw.rect(pantalla, ROJO, boton_nivel, border_radius=10)
+    pygame.draw.rect(pantalla,ROJO, boton_salir, border_radius=10)
 
-    mostrar_mensaje("Jugar", (590, 215))
-    mostrar_mensaje("Promedio de tiempo", (510, 315))
-    mostrar_mensaje("Coins", (590, 415))
-    mostrar_mensaje("Record de monedas", (510, 515))
+    mostrar_mensaje("Jugar", (590, 135))
+    mostrar_mensaje("Promedio de tiempo", (510, 230))
+    mostrar_mensaje("Coins", (590, 330))
+    mostrar_mensaje("Record de monedas", (510, 430))
+    mostrar_mensaje("Nivel alcanzado", (540, 530))
+    mostrar_mensaje("Salir", (590, 630))
 
     pantalla.blit(icono_volumen_actual, (150, 50))
 
     texto_volumen = "Music on" if volumen_encendido else "Music off"
-    mostrar_mensaje(texto_volumen, (30, 70))
+    mostrar_mensaje_volumen(texto_volumen, (30, 70))
 
-    pygame.display.flip()
-    return boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen
+    diccionario = [boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen, boton_nivel, boton_salir]
+
+    pygame.display.update()
+    return diccionario
 
 def cambiar_volumen():
     global volumen_encendido, icono_volumen_actual
@@ -112,9 +150,58 @@ def cambiar_volumen():
         pygame.mixer.music.set_volume(0.0)
         icono_volumen_actual = icono_volumen_off
 
-def jugar():
-    global vidas, monedas, rounds, tiempos_respuestas, comodines, ya_usados, promedio_tiempo, record_monedas
+def mostrar_respuesta_correcta(logo_correcto):
+    pantalla.blit(fondo, (0, 0))
+    mostrar_mensaje("La respuesta correcta es:", (420, 100))
+    pantalla.blit(logo_correcto["imagen"], (440, 200))
+    pygame.display.update()
+    time.sleep(2)
 
+def explicacion():
+    pantalla.blit(fondo_explicacion, (0, 0))
+    texto_explicacion = [
+        "EL JUEGO CONSISTE EN LO SIGUIENTE:",
+        "En cuanto le des al botón 'Sí'",
+        "Se te mostrarán 4 logos y arriba se te preguntará cuál es el correcto.",
+        "En caso de acertar, pasarás a la siguiente ronda.",
+        "De lo contrario, tendrás que elegir otro hasta acertar.",
+        "El juego consiste en 15 rondas.",
+        "Tienes 3 comodines:",
+        "Half: deja 2 opciones",
+        "Next: pasa de pregunta",
+        "Reload: cambia la pregunta"
+    ]
+    y_offset = 100
+    for linea in texto_explicacion:
+        mostrar_mensaje(linea, (50, y_offset))
+        y_offset += 40  # Ajusta la separación entre líneas según sea necesario
+
+    boton_si = pygame.Rect(450, 550, 100, 50)
+    boton_no = pygame.Rect(650, 550, 100, 50)
+    pygame.draw.rect(pantalla, ROJO, boton_si, border_radius=10)
+    pygame.draw.rect(pantalla, ROJO, boton_no, border_radius=10)
+    mostrar_mensaje("Sí", (490, 565))
+    mostrar_mensaje("No", (690, 565))
+    pygame.display.update()
+
+    esperando = True
+    while esperando:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif evento.type == pygame.MOUSEBUTTONDOWN:
+                if boton_si.collidepoint(evento.pos):
+                    esperando = False
+                    return True
+                elif boton_no.collidepoint(evento.pos):
+                    esperando = False
+                    return False
+
+    pantalla.fill(NEGRO)
+    pygame.display.update()
+
+def jugar():
     vidas = 5
     monedas = 0
     rounds = 0
@@ -142,24 +229,17 @@ def jugar():
                     sys.exit()
                 if evento.type == pygame.MOUSEBUTTONDOWN:
                     x, y = evento.pos
-                    if botones_opciones[0].collidepoint(x, y) and opciones_mostradas[0] == logo_correcto["imagen"]:
+                    if any(boton.collidepoint(x, y) and opciones_mostradas[i] == logo_correcto["imagen"] for i, boton in enumerate(botones_opciones)):
                         monedas += 20
                         siguiente_ronda = True
-                    elif botones_opciones[1].collidepoint(x, y) and opciones_mostradas[1] == logo_correcto["imagen"]:
-                        monedas += 20
-                        siguiente_ronda = True
-                    elif botones_opciones[2].collidepoint(x, y) and opciones_mostradas[2] == logo_correcto["imagen"]:
-                        monedas += 20
-                        siguiente_ronda = True
-                    elif botones_opciones[3].collidepoint(x, y) and opciones_mostradas[3] == logo_correcto["imagen"]:
-                        monedas += 20
-                        siguiente_ronda = True
-                    elif botones_opciones[0].collidepoint(x, y) or botones_opciones[1].collidepoint(x, y) or botones_opciones[2].collidepoint(x, y) or botones_opciones[3].collidepoint(x, y):
+                    elif any(boton.collidepoint(x, y) for boton in botones_opciones):
                         monedas -= 10
                         vidas -= 1
+                        siguiente_ronda = True
                     elif boton_next.collidepoint(x, y) and comodines["Next"] > 0:
                         comodines["Next"] -= 1
                         monedas += 20
+                        mostrar_respuesta_correcta(logo_correcto)
                         siguiente_ronda = True
                     elif boton_half.collidepoint(x, y) and comodines["Half"] > 0:
                         comodines["Half"] -= 1
@@ -236,6 +316,7 @@ def jugar():
     pygame.display.update()
     time.sleep(5)
 
+
 def mostrar_promedio():
     pantalla.blit(fondo, (0, 0))
     mostrar_mensaje(f"Promedio de tiempo de respuesta: {promedio_tiempo:.2f} segundos", (400, 300))
@@ -248,36 +329,40 @@ def mostrar_coins():
     pygame.display.update()
     time.sleep(3)
 
+def mostrar_nivel():
+    pantalla.blit(fondo, (0, 0))
+    mostrar_mensaje_volumen(f"Nivel ACTUAL: {determinar_nivel(record_monedas)}", (400, 300))
+    pygame.display.update()
+    time.sleep(3)
+
+
 def mostrar_record():
     pantalla.blit(fondo, (0, 0))
     mostrar_mensaje(f"Record de monedas: {record_monedas}", (400, 300))
     pygame.display.update()
     time.sleep(3)
-
 ejecutando = True
-boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen = pantalla_inicial()
-
 while ejecutando:
+    boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen, boton_nivel, boton_salir = pantalla_inicial()
     for evento in pygame.event.get():
         if evento.type == pygame.QUIT:
             ejecutando = False
         elif evento.type == pygame.MOUSEBUTTONDOWN:
             x, y = evento.pos
             if boton_jugar.collidepoint(x, y):
-                jugar()
-                boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen = pantalla_inicial()
+                if explicacion():
+                    jugar()
             elif boton_promedio.collidepoint(x, y):
                 mostrar_promedio()
-                boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen = pantalla_inicial()
             elif boton_coins.collidepoint(x, y):
                 mostrar_coins()
-                boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen = pantalla_inicial()
             elif boton_record.collidepoint(x, y):
                 mostrar_record()
-                boton_jugar, boton_promedio, boton_coins, boton_record, boton_volumen = pantalla_inicial()
             elif boton_volumen.collidepoint(x, y):
                 cambiar_volumen()
-                pantalla_inicial()
-
+            elif boton_nivel.collidepoint(x,y):
+                mostrar_nivel()
+            elif boton_salir.collidepoint(x,y):
+                ejecutando = False
 pygame.quit()
 sys.exit()
