@@ -1,3 +1,0 @@
-from logoman import *
-
-
